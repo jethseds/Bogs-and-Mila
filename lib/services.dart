@@ -101,7 +101,7 @@ class Services {
       'username': username,
       'password': password,
       'archive': '0',
-      'vacant': 'Yes'
+      'vacant': 'No'
     });
   }
 

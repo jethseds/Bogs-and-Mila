@@ -19,8 +19,6 @@ class MessagePage extends StatefulWidget {
 class _MessagePage extends State<MessagePage> {
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser!;
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(

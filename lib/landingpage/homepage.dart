@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -9,6 +10,52 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePage extends State<HomePage> {
+  double totalAmount = 0.0;
+  double computeTotalBuilding(List<Map<String, dynamic>> buildingRecords) {
+    double total = 0.0;
+
+    for (var record in buildingRecords) {
+      // Make sure to safely handle potential null or non-numeric values
+      var availableValue = record['available'];
+      if (availableValue is num) {
+        total += availableValue.toDouble();
+      } else if (availableValue is String) {
+        // Optionally handle string representations of numbers
+        total += double.tryParse(availableValue) ?? 0.0;
+      }
+    }
+
+    return total;
+  }
+
+  Future<void> fetchAndComputeTotal() async {
+    try {
+      QuerySnapshot snapshot =
+          await FirebaseFirestore.instance.collection('building').get();
+
+      List<Map<String, dynamic>> buildingRecords = snapshot.docs
+          .map((doc) => doc.data() as Map<String, dynamic>)
+          .toList();
+
+      print(
+          'Fetched records: $buildingRecords'); // Add this line to see the fetched data
+
+      setState(() {
+        totalAmount = computeTotalBuilding(buildingRecords);
+        print('Computed Total: $totalAmount'); // Print the computed total
+      });
+    } catch (e) {
+      print(
+          'Error fetching or computing total: $e'); // Catch and print any errors
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchAndComputeTotal();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -364,8 +411,47 @@ class _HomePage extends State<HomePage> {
                                           image:
                                               AssetImage('assets/cloud2.png')),
                                     ),
-                                    const Image(
-                                        image: AssetImage('assets/house.png')),
+                                    Center(
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          const Image(
+                                            image:
+                                                AssetImage('assets/house2.png'),
+                                            fit: BoxFit
+                                                .cover, // Optional: adjust how the image fits
+                                            width:
+                                                200, // Optional: set a specific width for the image
+                                            height:
+                                                200, // Optional: set a specific height for the image
+                                          ),
+                                          Text(
+                                            totalAmount.toString(),
+                                            style: const TextStyle(
+                                              color: Colors
+                                                  .white, // Adjust text color for visibility
+                                              fontSize: 50, // Adjust font size
+                                              fontWeight: FontWeight
+                                                  .bold, // Make text bold
+                                            ),
+                                          ),
+                                          Container(
+                                            margin: EdgeInsets.only(top: 80),
+                                            child: Text(
+                                              'Available Units',
+                                              style: const TextStyle(
+                                                color: Colors
+                                                    .white, // Adjust text color for visibility
+                                                fontSize:
+                                                    18, // Adjust font size
+                                                fontWeight: FontWeight
+                                                    .bold, // Make text bold
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ),
                                     Container(
                                       margin: const EdgeInsets.only(top: 100),
                                       child: const Image(

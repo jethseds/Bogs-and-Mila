@@ -15,6 +15,8 @@ class _LoginPage extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   String selectedValue = 'Super Admin'; // Default selection
+  String invalidEmail = "";
+  String invalidPassword = "";
   @override
   Widget build(BuildContext context) {
     List<String> dropdownItems = ['Super Admin', 'Admin'];
@@ -116,6 +118,13 @@ class _LoginPage extends State<LoginPage> {
                       ),
                     ),
                   ),
+                  Container(
+                    alignment: Alignment.bottomLeft,
+                    child: Text(
+                      invalidEmail,
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ),
                   const SizedBox(height: 20),
                   Container(
                     alignment: Alignment.bottomLeft,
@@ -138,6 +147,13 @@ class _LoginPage extends State<LoginPage> {
                         labelText: 'Password',
                         border: InputBorder.none,
                       ),
+                    ),
+                  ),
+                  Container(
+                    alignment: Alignment.bottomLeft,
+                    child: Text(
+                      invalidPassword,
+                      style: TextStyle(color: Colors.red),
                     ),
                   ),
                   const SizedBox(height: 30),
@@ -182,7 +198,10 @@ class _LoginPage extends State<LoginPage> {
                                 );
                               }
                             } else {
-                              errorMessge('Invalid Credentials!');
+                              setState(() {
+                                invalidEmail = "Invalid Username";
+                                invalidPassword = "Invalid Password";
+                              });
                             }
                           });
                         } else {
@@ -202,10 +221,16 @@ class _LoginPage extends State<LoginPage> {
                                         uid: uid, type: selectedValue)),
                               );
                             } else {
-                              errorMessge('Invalid Credentials!');
+                              setState(() {
+                                invalidEmail = "Invalid Username";
+                                invalidPassword = "Invalid Password";
+                              });
                             }
                           }).catchError((error) {
-                            errorMessge('Invalid Credentials!');
+                            setState(() {
+                              invalidEmail = "Invalid Username";
+                              invalidPassword = "Invalid Password";
+                            });
                           });
                         }
                       },

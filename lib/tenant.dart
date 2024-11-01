@@ -1,7 +1,9 @@
 import 'package:bogsandmila/logo.dart';
+import 'package:bogsandmila/tenantsalesrecord.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
 
 class TenantPage extends StatefulWidget {
   // ignore: prefer_typing_uninitialized_variables
@@ -27,11 +29,13 @@ class _TenantPageState extends State<TenantPage> {
   String? selectedValue;
   String? selectedValue2;
   String vacantValue = 'Yes';
+  String? paymentValue;
   @override
   Widget build(BuildContext context) {
     List<String> dropdownItems = [
+      'Payment',
       'Vacancy',
-      'Vie Sub-Account',
+      'View Sub-Account',
       'Reset Password',
       'Archive'
     ];
@@ -131,22 +135,8 @@ class _TenantPageState extends State<TenantPage> {
                                 columns: [
                                   DataColumn(
                                     label: Container(
-                                      width: MediaQuery.of(context).size.width /
-                                          10,
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: const Text(
-                                        'Payer Name',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  DataColumn(
-                                    label: Container(
-                                      width: MediaQuery.of(context).size.width /
-                                          10,
+                                      width:
+                                          MediaQuery.of(context).size.width / 8,
                                       padding: const EdgeInsets.all(8.0),
                                       child: const Text(
                                         'Building Number',
@@ -159,8 +149,8 @@ class _TenantPageState extends State<TenantPage> {
                                   ),
                                   DataColumn(
                                     label: Container(
-                                      width: MediaQuery.of(context).size.width /
-                                          10,
+                                      width:
+                                          MediaQuery.of(context).size.width / 8,
                                       padding: const EdgeInsets.all(8.0),
                                       child: const Text(
                                         'Unit Number',
@@ -173,8 +163,8 @@ class _TenantPageState extends State<TenantPage> {
                                   ),
                                   DataColumn(
                                     label: Container(
-                                      width: MediaQuery.of(context).size.width /
-                                          10,
+                                      width:
+                                          MediaQuery.of(context).size.width / 8,
                                       padding: const EdgeInsets.all(8.0),
                                       child: const Text(
                                         'Contact Number',
@@ -187,8 +177,8 @@ class _TenantPageState extends State<TenantPage> {
                                   ),
                                   DataColumn(
                                     label: Container(
-                                      width: MediaQuery.of(context).size.width /
-                                          10,
+                                      width:
+                                          MediaQuery.of(context).size.width / 8,
                                       padding: const EdgeInsets.all(8.0),
                                       child: const Text(
                                         'Username',
@@ -201,8 +191,8 @@ class _TenantPageState extends State<TenantPage> {
                                   ),
                                   DataColumn(
                                     label: Container(
-                                      width: MediaQuery.of(context).size.width /
-                                          10,
+                                      width:
+                                          MediaQuery.of(context).size.width / 8,
                                       padding: const EdgeInsets.all(8.0),
                                       child: const Text(
                                         'Password',
@@ -215,8 +205,8 @@ class _TenantPageState extends State<TenantPage> {
                                   ),
                                   DataColumn(
                                     label: Container(
-                                      width: MediaQuery.of(context).size.width /
-                                          10,
+                                      width:
+                                          MediaQuery.of(context).size.width / 8,
                                       padding: const EdgeInsets.all(8.0),
                                       child: const Text(
                                         'Action',
@@ -241,17 +231,10 @@ class _TenantPageState extends State<TenantPage> {
                                         doc['contactnumber'] ?? '';
                                     final username = doc['username'] ?? '';
                                     final password = doc['password'] ?? '';
+                                    final vacant = doc['vacant'] ?? '';
 
                                     return DataRow(
                                       cells: [
-                                        DataCell(
-                                          Container(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Text('$firstname $lastname',
-                                                style: const TextStyle(
-                                                    color: Colors.black)),
-                                          ),
-                                        ),
                                         DataCell(
                                           Container(
                                             padding: const EdgeInsets.all(8.0),
@@ -279,9 +262,23 @@ class _TenantPageState extends State<TenantPage> {
                                         DataCell(
                                           Container(
                                             padding: const EdgeInsets.all(8.0),
-                                            child: Text(username,
-                                                style: const TextStyle(
-                                                    color: Colors.black)),
+                                            child: GestureDetector(
+                                              child: Text(username,
+                                                  style: const TextStyle(
+                                                      color: Colors.black)),
+                                              onTap: () {
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            TenantSalesRecordPage(
+                                                                uid: widget.uid,
+                                                                type:
+                                                                    widget.type,
+                                                                tenant_id:
+                                                                    doc.id)));
+                                              },
+                                            ),
                                           ),
                                         ),
                                         DataCell(
@@ -305,47 +302,500 @@ class _TenantPageState extends State<TenantPage> {
                                               setState(() {
                                                 selectedValue = null;
 
-                                                if (newValue == 'Vacancy') {
+                                                if (newValue == 'Payment') {
+                                                  String? PaymentValue;
+
+                                                  showDialog(
+                                                    context: context,
+                                                    builder:
+                                                        (BuildContext context) {
+                                                      return StatefulBuilder(
+                                                        builder: (BuildContext
+                                                                context,
+                                                            StateSetter
+                                                                setState) {
+                                                          return AlertDialog(
+                                                            title: const Text(
+                                                                'Payment'),
+                                                            content: SizedBox(
+                                                              height: 100,
+                                                              child: Column(
+                                                                children: [
+                                                                  RadioListTile<
+                                                                      String>(
+                                                                    title: const Text(
+                                                                        'Paid'),
+                                                                    value:
+                                                                        'Paid',
+                                                                    groupValue:
+                                                                        PaymentValue,
+                                                                    onChanged:
+                                                                        (String?
+                                                                            newValue) {
+                                                                      setState(
+                                                                          () {
+                                                                        PaymentValue =
+                                                                            newValue;
+                                                                      });
+                                                                    },
+                                                                  ),
+                                                                  RadioListTile<
+                                                                      String>(
+                                                                    title: const Text(
+                                                                        'Unpaid'),
+                                                                    value:
+                                                                        'Unpaid',
+                                                                    groupValue:
+                                                                        PaymentValue,
+                                                                    onChanged:
+                                                                        (String?
+                                                                            newValue) {
+                                                                      setState(
+                                                                          () {
+                                                                        PaymentValue =
+                                                                            newValue;
+                                                                      });
+                                                                    },
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                            actions: [
+                                                              TextButton(
+                                                                onPressed: () {
+                                                                  Navigator.of(
+                                                                          context)
+                                                                      .pop(); // Close the dialog
+                                                                },
+                                                                child:
+                                                                    const Text(
+                                                                        'Close'),
+                                                              ),
+                                                              TextButton(
+                                                                onPressed:
+                                                                    () async {
+                                                                  String
+                                                                      getCurrentMonth() {
+                                                                    return DateFormat
+                                                                            .MMMM()
+                                                                        .format(
+                                                                            DateTime.now());
+                                                                  }
+
+                                                                  String
+                                                                      getCurrentYear() {
+                                                                    return DateFormat
+                                                                            .y()
+                                                                        .format(
+                                                                            DateTime.now());
+                                                                  }
+
+                                                                  String
+                                                                      getCurrentDateTime() {
+                                                                    return DateFormat(
+                                                                            'yyyy-MM-dd – HH:mm')
+                                                                        .format(
+                                                                            DateTime.now());
+                                                                  }
+
+                                                                  String
+                                                                      rental_cost =
+                                                                      "";
+                                                                  if (widget
+                                                                          .buildingnumber ==
+                                                                      1) {
+                                                                    rental_cost =
+                                                                        "500";
+                                                                  } else if (widget
+                                                                          .buildingnumber ==
+                                                                      2) {
+                                                                    rental_cost =
+                                                                        "600";
+                                                                  } else if (widget
+                                                                          .buildingnumber ==
+                                                                      3) {
+                                                                    rental_cost =
+                                                                        "700";
+                                                                  } else if (widget
+                                                                          .buildingnumber ==
+                                                                      4) {
+                                                                    rental_cost =
+                                                                        "800";
+                                                                  } else if (widget
+                                                                          .buildingnumber ==
+                                                                      5) {
+                                                                    rental_cost =
+                                                                        "900";
+                                                                  }
+
+                                                                  final firestore =
+                                                                      FirebaseFirestore
+                                                                          .instance;
+
+                                                                  String
+                                                                      currentMonth =
+                                                                      getCurrentMonth();
+                                                                  String
+                                                                      currentYear =
+                                                                      getCurrentYear();
+                                                                  String uid =
+                                                                      doc.id;
+
+                                                                  try {
+                                                                    QuerySnapshot querySnapshot = await firestore
+                                                                        .collection(
+                                                                            'sales_record')
+                                                                        .where(
+                                                                            'month',
+                                                                            isEqualTo:
+                                                                                currentMonth)
+                                                                        .where(
+                                                                            'year',
+                                                                            isEqualTo:
+                                                                                currentYear)
+                                                                        .where(
+                                                                            'uid',
+                                                                            isEqualTo:
+                                                                                uid)
+                                                                        .get();
+
+                                                                    if (querySnapshot
+                                                                        .docs
+                                                                        .isNotEmpty) {
+                                                                      DocumentReference
+                                                                          documentRef =
+                                                                          querySnapshot
+                                                                              .docs
+                                                                              .first
+                                                                              .reference;
+                                                                      await documentRef
+                                                                          .update({
+                                                                        'payer_name':
+                                                                            '$firstname $lastname',
+                                                                        'rental_cost':
+                                                                            rental_cost,
+                                                                        'building': widget
+                                                                            .buildingnumber
+                                                                            .toString(),
+                                                                        'datetime':
+                                                                            getCurrentDateTime(),
+                                                                        'status':
+                                                                            PaymentValue, // Use PaymentValue directly
+                                                                      });
+                                                                    } else {
+                                                                      await firestore
+                                                                          .collection(
+                                                                              'sales_record')
+                                                                          .add({
+                                                                        'month':
+                                                                            currentMonth,
+                                                                        'year':
+                                                                            currentYear,
+                                                                        'uid':
+                                                                            uid,
+                                                                        'payer_name':
+                                                                            '$firstname $lastname',
+                                                                        'rental_cost':
+                                                                            rental_cost,
+                                                                        'building': widget
+                                                                            .buildingnumber
+                                                                            .toString(),
+                                                                        'datetime':
+                                                                            getCurrentDateTime(),
+                                                                        'status':
+                                                                            PaymentValue, // Use PaymentValue directly
+                                                                      });
+                                                                    }
+
+                                                                    SuccessMessage(
+                                                                        'Successfully Set Vacant');
+                                                                    Navigator.of(
+                                                                            context)
+                                                                        .pop();
+                                                                  } catch (e) {
+                                                                    print(
+                                                                        "Error: $e");
+                                                                  }
+                                                                },
+                                                                child:
+                                                                    const Text(
+                                                                        'Save'),
+                                                              ),
+                                                            ],
+                                                          );
+                                                        },
+                                                      );
+                                                    },
+                                                  );
+                                                } else if (newValue ==
+                                                    'Vacancy') {
+                                                  String vacantValue = 'Yes';
+
+                                                  showDialog(
+                                                    context: context,
+                                                    builder:
+                                                        (BuildContext context) {
+                                                      return StatefulBuilder(
+                                                        builder: (BuildContext
+                                                                context,
+                                                            StateSetter
+                                                                setState) {
+                                                          return AlertDialog(
+                                                            title: const Text(
+                                                                'Vacancy'),
+                                                            content: SizedBox(
+                                                              height: 100,
+                                                              child: Column(
+                                                                children: [
+                                                                  RadioListTile<
+                                                                      String>(
+                                                                    title: const Text(
+                                                                        'Yes'),
+                                                                    value:
+                                                                        'Yes',
+                                                                    groupValue:
+                                                                        vacantValue,
+                                                                    onChanged:
+                                                                        (String?
+                                                                            newValue) {
+                                                                      setState(
+                                                                          () {
+                                                                        vacantValue =
+                                                                            newValue!;
+                                                                      });
+                                                                    },
+                                                                  ),
+                                                                  RadioListTile<
+                                                                      String>(
+                                                                    title:
+                                                                        const Text(
+                                                                            'No'),
+                                                                    value: 'No',
+                                                                    groupValue:
+                                                                        vacantValue,
+                                                                    onChanged:
+                                                                        (String?
+                                                                            newValue) {
+                                                                      setState(
+                                                                          () {
+                                                                        vacantValue =
+                                                                            newValue!;
+                                                                      });
+                                                                    },
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                            actions: [
+                                                              TextButton(
+                                                                onPressed: () {
+                                                                  Navigator.of(
+                                                                          context)
+                                                                      .pop(); // Close the dialog
+                                                                },
+                                                                child:
+                                                                    const Text(
+                                                                        'Close'),
+                                                              ),
+                                                              TextButton(
+                                                                onPressed: () {
+                                                                  FirebaseFirestore
+                                                                      .instance
+                                                                      .collection(
+                                                                          'tenant')
+                                                                      .doc(doc
+                                                                          .id)
+                                                                      .update({
+                                                                    'vacant':
+                                                                        vacantValue
+                                                                  });
+
+                                                                  if (vacantValue ==
+                                                                      'Yes') {
+                                                                    if (vacantValue ==
+                                                                        vacant) {
+                                                                    } else {
+                                                                      FirebaseFirestore
+                                                                          .instance
+                                                                          .collection(
+                                                                              'building')
+                                                                          .where(
+                                                                              'building',
+                                                                              isEqualTo:
+                                                                                  buildingnumber)
+                                                                          .get()
+                                                                          .then(
+                                                                              (querySnapshot) {
+                                                                        for (var doc
+                                                                            in querySnapshot.docs) {
+                                                                          // Check if 'available' is stored as a String and convert it to an int
+                                                                          int currentAvailable =
+                                                                              int.tryParse(doc['available'].toString()) ?? 0;
+                                                                          int updatedAvailable =
+                                                                              currentAvailable - 1;
+
+                                                                          // Update the document with the new 'available' value
+                                                                          doc.reference
+                                                                              .update({
+                                                                            'available':
+                                                                                updatedAvailable.toString(),
+                                                                          });
+                                                                        }
+                                                                      });
+                                                                    }
+                                                                  } else {
+                                                                    if (vacantValue ==
+                                                                        vacant) {
+                                                                    } else {
+                                                                      FirebaseFirestore
+                                                                          .instance
+                                                                          .collection(
+                                                                              'building')
+                                                                          .where(
+                                                                              'building',
+                                                                              isEqualTo:
+                                                                                  buildingnumber)
+                                                                          .get()
+                                                                          .then(
+                                                                              (querySnapshot) {
+                                                                        for (var doc
+                                                                            in querySnapshot.docs) {
+                                                                          // Check if 'available' is stored as a String and convert it to an int
+                                                                          int currentAvailable =
+                                                                              int.tryParse(doc['available'].toString()) ?? 0;
+                                                                          int updatedAvailable =
+                                                                              currentAvailable + 1;
+
+                                                                          // Update the document with the new 'available' value
+                                                                          doc.reference
+                                                                              .update({
+                                                                            'available':
+                                                                                updatedAvailable.toString(),
+                                                                          });
+                                                                        }
+                                                                      });
+                                                                    }
+                                                                  }
+
+                                                                  SuccessMessage(
+                                                                      'Successfully Set Vacant');
+                                                                  Navigator.of(
+                                                                          context)
+                                                                      .pop();
+                                                                },
+                                                                child:
+                                                                    const Text(
+                                                                        'Save'),
+                                                              ),
+                                                            ],
+                                                          );
+                                                        },
+                                                      );
+                                                    },
+                                                  );
+                                                } else if (newValue ==
+                                                    'View Sub-Account') {
                                                   showDialog(
                                                     context: context,
                                                     builder:
                                                         (BuildContext context) {
                                                       return AlertDialog(
                                                         title: const Text(
-                                                            'Vacancy'),
+                                                            'Sub View Account'),
                                                         content: SizedBox(
-                                                          height: 100,
-                                                          child: Column(
+                                                          height: 300,
+                                                          width:
+                                                              600, // Allow space for the ListView
+                                                          child: Row(
                                                             children: [
-                                                              DropdownButtonFormField<
-                                                                  String>(
-                                                                value:
-                                                                    vacantValue,
-                                                                decoration:
-                                                                    const InputDecoration(
-                                                                  border:
-                                                                      InputBorder
-                                                                          .none,
+                                                              Expanded(
+                                                                // Wrap ListView with Flexible
+                                                                child: StreamBuilder<
+                                                                    QuerySnapshot>(
+                                                                  stream: FirebaseFirestore
+                                                                      .instance
+                                                                      .collection(
+                                                                          'Sub-Tenant')
+                                                                      .where(
+                                                                          'mainAccountId',
+                                                                          isEqualTo:
+                                                                              doc.id)
+                                                                      .snapshots(),
+                                                                  builder: (context,
+                                                                      AsyncSnapshot<
+                                                                              QuerySnapshot>
+                                                                          snapshot) {
+                                                                    if (snapshot
+                                                                        .hasError) {
+                                                                      return Text(
+                                                                          'Something went wrong');
+                                                                    }
+
+                                                                    if (snapshot
+                                                                            .connectionState ==
+                                                                        ConnectionState
+                                                                            .waiting) {
+                                                                      return CircularProgressIndicator();
+                                                                    }
+
+                                                                    if (!snapshot
+                                                                            .hasData ||
+                                                                        snapshot
+                                                                            .data!
+                                                                            .docs
+                                                                            .isEmpty) {
+                                                                      return Text(
+                                                                          'No data found');
+                                                                    }
+
+                                                                    // Data successfully retrieved
+                                                                    return ListView(
+                                                                      children: snapshot
+                                                                          .data!
+                                                                          .docs
+                                                                          .map((DocumentSnapshot
+                                                                              document) {
+                                                                        Map<String,
+                                                                                dynamic>
+                                                                            data =
+                                                                            document.data()
+                                                                                as Map<String, dynamic>;
+
+                                                                        String
+                                                                            name =
+                                                                            data['name'] ??
+                                                                                'No name';
+                                                                        String
+                                                                            password =
+                                                                            data['password'] ??
+                                                                                'No password';
+                                                                        String
+                                                                            contact =
+                                                                            data['contact'] ??
+                                                                                'No contact';
+                                                                        String
+                                                                            mainAccountId =
+                                                                            data['mainAccountId'] ??
+                                                                                'No contact';
+
+                                                                        return ListTile(
+                                                                          title:
+                                                                              Text(name),
+                                                                          subtitle:
+                                                                              Column(
+                                                                            crossAxisAlignment:
+                                                                                CrossAxisAlignment.start,
+                                                                            children: [
+                                                                              Text('Password: $password'),
+                                                                              Text('Contact: $contact'),
+                                                                              Text('mainAccountId: $mainAccountId'),
+                                                                            ],
+                                                                          ),
+                                                                        );
+                                                                      }).toList(),
+                                                                    );
+                                                                  },
                                                                 ),
-                                                                onChanged: (String?
-                                                                    newValue) {
-                                                                  setState(() {
-                                                                    vacantValue =
-                                                                        newValue!;
-                                                                  });
-                                                                },
-                                                                items: dropdownVacant.map<
-                                                                    DropdownMenuItem<
-                                                                        String>>((String
-                                                                    value) {
-                                                                  return DropdownMenuItem<
-                                                                      String>(
-                                                                    value:
-                                                                        value,
-                                                                    child: Text(
-                                                                        value),
-                                                                  );
-                                                                }).toList(),
                                                               ),
                                                             ],
                                                           ),
@@ -362,31 +812,7 @@ class _TenantPageState extends State<TenantPage> {
                                                           ),
                                                           TextButton(
                                                             onPressed: () {
-                                                              if (vacantValue ==
-                                                                  'Yes') {
-                                                                FirebaseFirestore
-                                                                    .instance
-                                                                    .collection(
-                                                                        'tenant')
-                                                                    .doc(doc.id)
-                                                                    .update({
-                                                                  'vacant':
-                                                                      'Yes',
-                                                                });
-                                                              } else {
-                                                                FirebaseFirestore
-                                                                    .instance
-                                                                    .collection(
-                                                                        'tenant')
-                                                                    .doc(doc.id)
-                                                                    .update({
-                                                                  'vacant':
-                                                                      'No',
-                                                                });
-                                                              }
-
-                                                              SuccessMessage(
-                                                                  'Successfully Set Vacant');
+                                                              // Save logic based on vacantValue
                                                               Navigator.of(
                                                                       context)
                                                                   .pop(); // Close the dialog

@@ -2,6 +2,7 @@ import 'package:bogsandmila/adminaccount.dart';
 import 'package:bogsandmila/announce.dart';
 import 'package:bogsandmila/archive.dart';
 import 'package:bogsandmila/building.dart';
+import 'package:bogsandmila/login.dart';
 import 'package:bogsandmila/logo.dart';
 import 'package:bogsandmila/manageuser.dart';
 import 'package:bogsandmila/message.dart';
@@ -10,6 +11,7 @@ import 'package:bogsandmila/salesrecord.dart';
 import 'package:bogsandmila/tenant.dart';
 import 'package:bogsandmila/vacancy.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class DashboardPage extends StatefulWidget {
@@ -53,19 +55,30 @@ class _DashboardPage extends State<DashboardPage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  GestureDetector(
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      alignment: Alignment.bottomLeft,
+                      child: FaIcon(FontAwesomeIcons.signOut),
+                    ),
+                    onTap: () {
+                      Navigator.pushReplacement(context,
+                          MaterialPageRoute(builder: (context) => LoginPage()));
+                    },
+                  ),
                   LogoPage(uid: widget.uid, type: widget.type),
                   const SizedBox(height: 30),
                   Container(
                     alignment: Alignment.center,
-                    child: const Text(
-                      'Dashboard',
+                    child: Text(
+                      widget.type == 'Admin' ? 'Admin' : 'Super Admin',
                       style:
                           TextStyle(fontWeight: FontWeight.w700, fontSize: 23),
                     ),
                   ),
                   SizedBox(height: widget.type == 'Super Admin' ? 90 : 10),
                   SizedBox(
-                      width: widget.type == 'Admin' ? 700 : 900,
+                      width: widget.type == 'Admin' ? 900 : 900,
                       child: Column(
                         children: [
                           if (widget.type == 'Super Admin')
@@ -74,35 +87,35 @@ class _DashboardPage extends State<DashboardPage> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
                                 children: [
-                                  GestureDetector(
-                                    onTap: _launchURL,
-                                    child: Container(
-                                      width: 200,
-                                      height: 200,
-                                      alignment: Alignment.center,
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xddF6F6F4),
-                                        borderRadius: BorderRadius.circular(5),
-                                      ),
-                                      child: const Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Image(
-                                            image: AssetImage(
-                                                'assets/systemmaintenance.png'),
-                                            fit: BoxFit.cover,
-                                          ),
-                                          Text(
-                                            'Maintenance System',
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.w700,
-                                                fontSize: 17),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
+                                  // GestureDetector(
+                                  //   onTap: _launchURL,
+                                  //   child: Container(
+                                  //     width: 200,
+                                  //     height: 200,
+                                  //     alignment: Alignment.center,
+                                  //     decoration: BoxDecoration(
+                                  //       color: const Color(0xddF6F6F4),
+                                  //       borderRadius: BorderRadius.circular(5),
+                                  //     ),
+                                  //     child: const Column(
+                                  //       mainAxisAlignment:
+                                  //           MainAxisAlignment.center,
+                                  //       children: [
+                                  //         Image(
+                                  //           image: AssetImage(
+                                  //               'assets/systemmaintenance.png'),
+                                  //           fit: BoxFit.cover,
+                                  //         ),
+                                  //         Text(
+                                  //           'Maintenance System',
+                                  //           style: TextStyle(
+                                  //               fontWeight: FontWeight.w700,
+                                  //               fontSize: 17),
+                                  //         ),
+                                  //       ],
+                                  //     ),
+                                  //   ),
+                                  // ),
                                   GestureDetector(
                                     onTap: _launchURL,
                                     child: Container(
@@ -153,30 +166,21 @@ class _DashboardPage extends State<DashboardPage> {
                           const SizedBox(
                             height: 20,
                           ),
-                          if (widget.type == 'Admin')
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                _cardContainer(4, "Sales Record",
-                                    "assets/salesrecord.png"),
-                                _cardContainer(
-                                    5, "Vacancy", "assets/vacancy.png"),
-                                _cardContainer(
-                                    6, "Manage User", "assets/manageuser.png"),
-                              ],
-                            ),
-                          const SizedBox(
-                            height: 20,
-                          ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
+                              if (widget.type == 'Admin')
+                                _cardContainer(4, "Sales Record",
+                                    "assets/salesrecord.png"),
+                              // _cardContainer(
+                              //     5, "Vacancy", "assets/vacancy.png"),
+                              if (widget.type == 'Admin')
+                                _cardContainer(
+                                    6, "Manage User", "assets/manageuser.png"),
                               _cardContainer(
                                   7, "Building", "assets/house2.png"),
                               _cardContainer(
                                   8, "Archive", "assets/archive.png"),
-                              _cardContainer(
-                                  9, "Admin Account", "assets/manageuser.png"),
                             ],
                           ),
                         ],
@@ -243,11 +247,10 @@ class _DashboardPage extends State<DashboardPage> {
             } else if (id == 5) {
               return VacancyPage(uid: widget.uid, type: widget.type);
             } else if (id == 6) {
-              if (widget.type == "Tenant") {
+              if (widget.type == "Admin") {
                 return ManageUserPage(uid: widget.uid, type: widget.type);
               } else {
-                return TenantPage(
-                    uid: widget.uid, type: widget.type, buildingnumber: '0');
+                return AdminAccountPage(uid: widget.uid, type: widget.type);
               }
             } else if (id == 7) {
               return BuildingPage(uid: widget.uid, type: widget.type);
@@ -255,6 +258,8 @@ class _DashboardPage extends State<DashboardPage> {
               return ArchivePage(uid: widget.uid, type: widget.type);
             } else if (id == 9) {
               return AdminAccountPage(uid: widget.uid, type: widget.type);
+            } else if (id == 10) {
+              return ManageUserPage(uid: widget.uid, type: widget.type);
             } else {
               return AnnouncePage(uid: widget.uid, type: widget.type);
             }

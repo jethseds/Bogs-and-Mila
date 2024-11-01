@@ -17,6 +17,45 @@ class SalesRecordPage extends StatefulWidget {
 class _SalesRecordPageState extends State<SalesRecordPage> {
   final int _rowsPerPage = 10;
   int _currentPage = 0;
+  String? selectedYear;
+  List<String> years = [
+    '2020',
+    '2021',
+    '2022',
+    '2023',
+    '2024',
+    '2025',
+    '2026',
+    '2027',
+    '2028',
+    '2029',
+    '2030'
+  ];
+
+  String? selectedMonth;
+  List<String> month = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+
+  String? selectedBuilding;
+  List<String> building = [
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -52,33 +91,112 @@ class _SalesRecordPageState extends State<SalesRecordPage> {
                     LogoPage(uid: widget.uid, type: widget.type),
                     const SizedBox(height: 20),
                     Container(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      color: const Color.fromARGB(240, 17, 17, 17),
-                      alignment: Alignment.center,
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          FaIcon(
-                            FontAwesomeIcons.house,
-                            color: Color(0xdd4D82D2),
-                          ),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Text(
-                            'BUILDING 1',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 23),
-                          ),
-                        ],
-                      ),
-                    ),
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 30),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Row(
+                                  children: [
+                                    SizedBox(
+                                      height: 50,
+                                      width:
+                                          200, // Ensure it takes available width
+                                      child: DropdownButtonFormField<String>(
+                                        value: selectedBuilding,
+                                        hint: const Text('Select Building'),
+                                        decoration: const InputDecoration(
+                                          border: InputBorder.none,
+                                        ),
+                                        onChanged: (String? newValue) {
+                                          setState(() {
+                                            selectedBuilding =
+                                                newValue; // Update the selected year
+                                            // fetchData();
+                                          });
+                                        },
+                                        items: building
+                                            .map<DropdownMenuItem<String>>(
+                                                (String building) {
+                                          return DropdownMenuItem<String>(
+                                            value: building,
+                                            child: Text('Building ${building}'),
+                                          );
+                                        }).toList(),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 50,
+                                      width:
+                                          200, // Ensure it takes available width
+                                      child: DropdownButtonFormField<String>(
+                                        value: selectedYear,
+                                        hint: const Text('Select Year'),
+                                        decoration: const InputDecoration(
+                                          border: InputBorder.none,
+                                        ),
+                                        onChanged: (String? newValue) {
+                                          setState(() {
+                                            selectedYear =
+                                                newValue; // Update the selected year
+                                            // fetchData();
+                                          });
+                                        },
+                                        items: years
+                                            .map<DropdownMenuItem<String>>(
+                                                (String year) {
+                                          return DropdownMenuItem<String>(
+                                            value: year,
+                                            child: Text(year),
+                                          );
+                                        }).toList(),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 50,
+                                      width:
+                                          200, // Ensure it takes available width
+                                      child: DropdownButtonFormField<String>(
+                                        value: selectedMonth,
+                                        hint: const Text('Select Month'),
+                                        decoration: const InputDecoration(
+                                          border: InputBorder.none,
+                                        ),
+                                        onChanged: (String? newValue) {
+                                          setState(() {
+                                            selectedMonth =
+                                                newValue; // Update the selected year
+                                            // fetchData();
+                                          });
+                                        },
+                                        items: month
+                                            .map<DropdownMenuItem<String>>(
+                                                (String month) {
+                                          return DropdownMenuItem<String>(
+                                            value: month,
+                                            child: Text(month),
+                                          );
+                                        }).toList(),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                              ],
+                            )
+                          ],
+                        )),
                     Expanded(
                       child: StreamBuilder<QuerySnapshot>(
                         stream: FirebaseFirestore.instance
                             .collection('sales_record')
+                            .where('year', isEqualTo: selectedYear)
+                            .where('month', isEqualTo: selectedMonth)
+                            .where('building', isEqualTo: selectedBuilding)
                             .snapshots(),
                         builder: (context, snapshot) {
                           if (snapshot.hasError) {

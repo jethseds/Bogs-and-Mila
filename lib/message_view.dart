@@ -56,92 +56,97 @@ class _MessageView extends State<MessageView> {
             Container(
               height: 520,
               child: StreamBuilder(
-                stream: FirebaseFirestore.instance
-                    .collection('messages')
-                    .orderBy("timestamp")
-                    .snapshots(),
+                stream: (() {
+                  // Conditional check to determine if orderBy should be applied
+                  if (chatroomID != null && chatroomID.isNotEmpty) {
+                    return FirebaseFirestore.instance
+                        .collection('messages')
+                        .orderBy("timestamp")
+                        .snapshots();
+                  } else {
+                    return FirebaseFirestore.instance
+                        .collection('messages')
+                        .snapshots();
+                  }
+                })(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     return ListView.builder(
-                        itemCount: snapshot.data!.docs.length,
-                        itemBuilder: (context, index) {
-                          final sender_email = snapshot.data!.docs[index]
-                                  ['sender'] ==
-                              widget.uid;
-                          final timestamp =
-                              snapshot.data!.docs[index]['timestamp'];
-                          DateTime? messageDate;
+                      itemCount: snapshot.data!.docs.length,
+                      itemBuilder: (context, index) {
+                        final timestamp =
+                            snapshot.data!.docs[index]['timestamp'];
+                        DateTime? messageDate;
 
-                          // Check if the timestamp is of type Timestamp and convert it to DateTime
-                          if (timestamp is Timestamp) {
-                            messageDate = timestamp
-                                .toDate(); // Convert Timestamp to DateTime
-                          }
-                          String formattedDate = '';
-                          if (messageDate != null) {
-                            formattedDate = DateFormat('MMM d, y h:mm a')
-                                .format(messageDate); // Updated format
-                          }
+                        // Check if the timestamp is of type Timestamp and convert it to DateTime
+                        if (timestamp is Timestamp) {
+                          messageDate = timestamp.toDate();
+                        }
+                        String formattedDate = '';
+                        if (messageDate != null) {
+                          formattedDate =
+                              DateFormat('MMM d, y h:mm a').format(messageDate);
+                        }
 
-                          if (chatroomID ==
-                              snapshot.data!.docs[index]['code']) {
-                            return Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                if (messageDate != null)
-                                  DateChip(
-                                    date: messageDate,
-                                    label:
-                                        formattedDate, // Pass the formatted date
-                                  ),
-                                sender_email
-                                    ? Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                        children: [
-                                          BubbleSpecialThree(
-                                            text: snapshot.data!.docs[index]
-                                                ['text'],
-                                            color: Color(0xdd607DE1),
-                                            tail: false,
-                                            textStyle: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 16),
-                                          ),
-                                          Container(
-                                            padding: EdgeInsets.only(right: 10),
-                                            child: FaIcon(
-                                                FontAwesomeIcons.userCircle),
-                                          )
-                                        ],
-                                      )
-                                    : Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                            padding: EdgeInsets.only(left: 10),
-                                            child: FaIcon(
-                                                FontAwesomeIcons.userCircle),
-                                          ),
-                                          BubbleSpecialThree(
-                                            text: snapshot.data!.docs[index]
-                                                ['text'],
-                                            color: Colors.grey,
-                                            tail: false,
-                                            isSender: false,
-                                            textStyle: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 16),
-                                          ),
-                                        ],
-                                      )
-                              ],
-                            );
-                          } else {
-                            Text('');
-                          }
-                        });
+                        if (chatroomID == snapshot.data!.docs[index]['code']) {
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              if (messageDate != null)
+                                DateChip(
+                                  date: messageDate,
+                                  label: formattedDate,
+                                ),
+                              snapshot.data!.docs[index]['sender'].toString() ==
+                                      widget.uid.toString()
+                                  ? Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        BubbleSpecialThree(
+                                          text: snapshot.data!.docs[index]
+                                              ['text'],
+                                          color: Color(0xdd607DE1),
+                                          tail: false,
+                                          textStyle: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16),
+                                        ),
+                                        Container(
+                                          padding: EdgeInsets.only(right: 10),
+                                          child: FaIcon(
+                                              FontAwesomeIcons.userCircle),
+                                        )
+                                      ],
+                                    )
+                                  : Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          padding: EdgeInsets.only(left: 10),
+                                          child: FaIcon(
+                                              FontAwesomeIcons.userCircle),
+                                        ),
+                                        BubbleSpecialThree(
+                                          text: snapshot.data!.docs[index]
+                                              ['text'],
+                                          color: Colors.grey,
+                                          tail: false,
+                                          isSender: false,
+                                          textStyle: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16),
+                                        ),
+                                      ],
+                                    )
+                            ],
+                          );
+                        } else {
+                          return SizedBox
+                              .shrink(); // Empty widget if chatroomID doesn't match
+                        }
+                      },
+                    );
                   } else {
                     return Text('NO MESSAGES');
                   }
