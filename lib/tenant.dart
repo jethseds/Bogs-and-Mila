@@ -405,27 +405,27 @@ class _TenantPageState extends State<TenantPage> {
                                                                           .buildingnumber ==
                                                                       1) {
                                                                     rental_cost =
-                                                                        "500";
+                                                                        "5000";
                                                                   } else if (widget
                                                                           .buildingnumber ==
                                                                       2) {
                                                                     rental_cost =
-                                                                        "600";
+                                                                        "5000";
                                                                   } else if (widget
                                                                           .buildingnumber ==
                                                                       3) {
                                                                     rental_cost =
-                                                                        "700";
+                                                                        "6000";
                                                                   } else if (widget
                                                                           .buildingnumber ==
                                                                       4) {
                                                                     rental_cost =
-                                                                        "800";
+                                                                        "3500";
                                                                   } else if (widget
                                                                           .buildingnumber ==
                                                                       5) {
                                                                     rental_cost =
-                                                                        "900";
+                                                                        "3500";
                                                                   }
 
                                                                   final firestore =

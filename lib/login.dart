@@ -22,12 +22,11 @@ class _LoginPage extends State<LoginPage> {
     List<String> dropdownItems = ['Super Admin', 'Admin'];
 
     return Scaffold(
-      backgroundColor: Colors.red,
       body: Stack(
         children: [
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 350, vertical: 109),
+            padding: const EdgeInsets.symmetric(horizontal: 350, vertical: 114),
             decoration: const BoxDecoration(
               image: DecorationImage(
                 image: AssetImage('assets/bg.jpg'),
